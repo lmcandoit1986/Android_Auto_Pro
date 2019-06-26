@@ -5,6 +5,7 @@ import android.app.UiAutomation;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
+import android.qa.xpro.ConfigGlobal;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
@@ -102,15 +103,22 @@ public class Support extends Connection{
                 if (event.getEventType()!= AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
                     return;
                 }
+
                 //获取消息来源
-                String sourcePackageName = (String) event.getPackageName();
+//                String sourcePackageName = (String) event.getPackageName();
 
                 //获取事件具体信息
                 Parcelable parcelable = event.getParcelableData();
 
                 //如果不是下拉通知栏消息，则为其它通知信息，包括Toast
                 if (!(parcelable instanceof Notification)) {
-                    Config.TOAST_TEXT = (String) event.getText().get(0);
+                    ConfigGlobal.TOAST_TEXT = (String) event.getText().get(0);
+                }else{
+                    Log_qa.print_i(event.getText().get(0).toString());
+                    String smstext = event.getText().get(0).toString();
+                    if(smstext.contains("中国平安: 尊敬的客户，您的验证码为")){
+                        ConfigGlobal.Code = smstext.split("：")[1].split("，")[0];
+                    }
                 }
             }
         });
